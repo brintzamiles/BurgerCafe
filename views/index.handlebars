@@ -1,0 +1,76 @@
+<div class="row">
+    <form class="w-50" >
+        <div class="form-group">
+            <input type="text" class="form-control" id="burgerName" placeholder="Please enter your burger order">
+       
+        <button type="button" class="btn" id="add-btn">Click Here to Add a Burger</button>
+    </form>
+</div>
+<div class="jumbotron  burger-cafe">
+    <div class="row">
+        <div class="col-6 h-100 available-burger text-center">
+            <div class="card-header bg-info text-white">
+                <h3>Available Burgers</h3>
+            </div>
+            {{#each burgers}}
+            {{#unless devoured}}
+
+            <button type="button" data-id="{{id}}" class="btn btn-primary devour-btn mt-2 w-100">{{burger_name}}</button>
+
+            {{/unless}}
+            {{/each}}
+        </div>
+        <div class="col-6 h-100 devoured-burger text-center">
+            <div class="card-header bg-info text-white">
+                <h3>Devoured</h3>
+            </div>
+            {{#each burgers}}
+            {{#if devoured}}
+            <div class="mt-2 w-100 btn-secondary py-1 rounded shadow">
+                {{burger_name}}
+            </div>
+            {{/if}}
+            {{/each}}
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery.js"></script>
+<script type="text/javascript">
+//code to eat/devour a burger
+    $(".devour-btn").on("click", function () {
+
+        var burgerId = $(this).data('id');
+        console.log("handler burgerId", burgerId);
+
+        var burger = {
+            devoured: true
+        };
+        $.ajax(`./api/devourburger/${burgerId}`, {
+            type: "PUT",
+            data: burger
+        }).then(() => {
+            location.reload();
+        });
+    });
+
+//code to add a burger
+  $('#add-btn').on('click', () => {
+        event.preventDefault();
+        const burgerName = $('#burgerName').val().trim();
+        if (burgerName !== "") {
+            var burger = {
+                burger_name: burgerName,
+                devoured: false
+            }
+        }
+        $.ajax(`/api/addburger`, {
+            type: "POST",
+            data: burger
+        }).then(() => {
+            location.reload();
+        });
+    });
+
+</script>
