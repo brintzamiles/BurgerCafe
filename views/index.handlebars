@@ -1,47 +1,81 @@
-<div class="row">
-    <form class="w-50" >
-        <div class="form-group">
-            <input type="text" class="form-control" id="burgerName" placeholder="Please enter your burger order">
-       
-        <button type="button" class="btn" id="add-btn">Click Here to Add a Burger</button>
-    </form>
-</div>
-<div class="jumbotron  burger-cafe">
-    <div class="row">
-        <div class="col-6 h-100 available-burger text-center">
-            <div class="card-header bg-info text-white">
-                <h3>Available Burgers</h3>
-            </div>
-            {{#each burgers}}
-            {{#unless devoured}}
+<div class="row" id = "burger-cafe">
+    <div class="col-6 pr-0">
+        <!-- Burgers Prepared to Order -->
+        <h3 class="section-title text-center"> Burgers Ready for Order/Pickup</h3>
+        <!-- Insert Prepared Burgers  -->
+        {{#each burgers}}
+        {{#unless devoured}}
 
-            <button type="button" data-id="{{id}}" class="btn btn-primary devour-btn mt-2 w-100">{{burger_name}}</button>
 
-            {{/unless}}
-            {{/each}}
-        </div>
-        <div class="col-6 h-100 devoured-burger text-center">
-            <div class="card-header bg-info text-white">
-                <h3>Devoured</h3>
-            </div>
-            {{#each burgers}}
-            {{#if devoured}}
-            <div class="mt-2 w-100 btn-secondary py-1 rounded shadow">
-                {{burger_name}}
-            </div>
-            {{/if}}
-            {{/each}}
-        </div>
+        <button type="button" data-id="{{this.id}}" class="btn btn-secondary py-1 shadow devour-btn mt-2 col-8">
+            {{burger_name}}
+        </button>
+        <button type="button" data-id="{{this.id}}" class="btn btn-success py-1 shadow devour-btn mt-2 col-3">
+            Eat Me
+        </button>
+        <br>
+
+        {{/unless}}
+        {{/each}}
+
     </div>
+    <div class="col-6">
+        <!-- Burgers Prepared to Order -->
+        <h3 class="section-title text-center"> Orders Already Sold/Eaten</h3>
+
+
+        <!-- Insert Eaten Burgers Here -->
+        {{#each burgers}}
+        {{#if this.devoured}}
+
+        <button type="button" data-id="{{this.id}}" class="btn btn-secondary py-1 shadow reorder-btn mt-2 col-8">
+            {{burger_name}}
+        </button>
+        <button type="button" data-id="{{this.id}}" class="btn btn-success py-1 shadow reorder-btn mt-2 col-3">
+            Reorder </button>
+        <br>
+
+        {{/if}}
+        {{/each}}
+
+    </div>
+    <br>
 </div>
 
+
+
+<!-- Text Area Input -->
+<div class="row">
+    <!-- Empty Div to help center textarea -->
+    <div class="col-md-3"></div>
+
+    <!-- Burger Input Box -->
+    <div class="form-group col-md-6">
+        <center><label for="new_burger" class="red_font">Place a new burger order!</label></center>
+        <textarea class="form-control" id="new_burger" name="burger_name"></textarea>
+    </div>
+
+    <!-- Empty Div to help center textarea -->
+    <div class="col-md-3"></div>
+</div>
+
+<!-- Submit Button -->
+<center>
+
+    <button id="submit-button" type="submit" class="btn btn-danger">Place Order</button>
+</center>
+
+</form>
+
+<br>
+
+</div>
 
 <script src="https://code.jquery.com/jquery.js"></script>
 <script type="text/javascript">
-//code to eat/devour a burger
+    //code to eat/devour a burger
     $(".devour-btn").on("click", function () {
-
-        var burgerId = $(this).data('id');
+        const burgerId = $(this).attr('data-id');
         console.log("handler burgerId", burgerId);
 
         var burger = {
@@ -54,11 +88,26 @@
             location.reload();
         });
     });
+    //code to reorder a burger
+    $(".reorder-btn").on("click", function () {
+        const burgerId = $(this).attr('data-id');
+        console.log("handler burgerId", burgerId);
 
-//code to add a burger
-  $('#add-btn').on('click', () => {
+        var burger = {
+            devoured: false
+        };
+        $.ajax(`./api/reorderburger/${burgerId}`, {
+            type: "PUT",
+            data: burger
+        }).then(() => {
+            location.reload();
+        });
+    });
+
+    //code to add a burger
+    $('#submit-button').on('click', () => {
         event.preventDefault();
-        const burgerName = $('#burgerName').val().trim();
+        const burgerName = $('#new_burger').val().trim();
         if (burgerName !== "") {
             var burger = {
                 burger_name: burgerName,
@@ -72,5 +121,7 @@
             location.reload();
         });
     });
+
+
 
 </script>
